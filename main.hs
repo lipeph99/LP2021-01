@@ -12,9 +12,9 @@ instance Show Rainha where
 -- Checa se duas rainhas se atacam
 ataca :: Rainha -> Rainha -> Bool
 ataca (Rainha x1 y1) (Rainha x2 y2)
-    -- same row or column
+    -- mesma linha ou coluna
     | (x1 == x2) || (y1 == y2)       = True
-    -- same diagonal
+    -- mesma diagonal
     | abs (x1 - x2) == abs (y1 - y2) = True
     | otherwise                      = False
 
@@ -22,9 +22,9 @@ ataca (Rainha x1 y1) (Rainha x2 y2)
 -- Coloca uma rainha se for possível
 valido :: Rainha -> [Rainha] -> Bool
 valido try []     = True
-valido try (q:qs) = if try `ataca` q
+valido try (r:rs) = if try `ataca` r
                           then False
-                          else valido try qs
+                          else valido try rs
 
 
 -- Coloca todas as rainhas num tabuleiro NxN
@@ -32,22 +32,21 @@ nRainhas :: Int -> [[Rainha]]
 nRainhas n = map reverse $ nRainhas' n where
     nRainhas' 0 = [[]]
     nRainhas' k =
-        let prevQs  = nRainhas' (k - 1)
-            legalQs = [Rainha (k - 1) y | y <- [0 .. n - 1]]
-         in [q:qs | qs <- prevQs, q <- legalQs, valido q qs]
+        let antRs  = nRainhas' (k - 1)
+            validas = [Rainha (k - 1) y | y <- [0 .. n - 1]]
+         in [r:rs | rs <- antRs, r <- validas, valido r rs]
 
 
 -- Imprime a lista de configurações válidas
-printQs :: [[Rainha]] -> IO ()
-printQs []     = putChar '\n'
-printQs (q:qs) = do
-    putStrLn $ show q
-    printQs qs
+imprimeR :: [[Rainha]] -> IO ()
+imprimeR []     = putChar '\n'
+imprimeR (r:rs) = do
+    putStrLn $ show r
+    imprimeR rs
 
 
 -- main
 main :: IO ()
 main = do
     let n = 6
-
-    printQs $ nRainhas n
+    imprimeR $ nRainhas n
